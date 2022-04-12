@@ -5,7 +5,7 @@ var repoSearchTerm = document.querySelector("#repo-search-term");
 
 var getUserRepos = function(username) {
     // Make the request
-    var apiUrl = `https://api.github.com/users/${username}/repos`
+    var apiUrl = `https://api.github.com/users/${username}/repos`;
     fetch(apiUrl).then(function(response) {
         if (response.ok) {
             // Process it
@@ -47,8 +47,10 @@ var displayRepos = function(repos, searchTerm) {
         var repoName = `${repo.owner.login}/${repo.name}`;
 
         // create container for each repo
-        var repoEl = document.createElement("div");
+        var repoEl = document.createElement("a");
         repoEl.classList = "list-item flex-row justify-space-between align-center";
+        // Processing data and passing it to another file with query parameters
+        repoEl.setAttribute("href", `./single-repo.html?repo=${repoName}`);
 
         var titleEl = document.createElement("span");
         titleEl.textContent = repoName;
