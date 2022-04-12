@@ -1,4 +1,19 @@
 var issuesContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
+
+var getRepoName = function() {
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+    if (repoName) {
+        // If a repo name was provided, display on page
+        repoNameEl.textContent = repoName;
+        getRepoIssues(repoName);
+    } else {
+        // If not, redirect to homepage
+        document.location.replace("./index.html");
+    }
+}
 
 var getRepoIssues = function(repo) {
     // console.log(repo);
@@ -7,11 +22,16 @@ var getRepoIssues = function(repo) {
         // request was successful
         if (response.ok) {
             response.json().then(function(data) {
-                console.log(data);
                 displayIssues(data);
+
+                // check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    displayWarning(repo);
+                }
             })
         } else {
-            alert("There was a problem with your request!");
+            // if not successful, redirect to homepage
+            document.location.replace("./index.html");
         }
     });
 }
@@ -43,7 +63,18 @@ var displayIssues = function(issues) {
         issueEl.appendChild(typeEl);
         issuesContainerEl.appendChild(issueEl);
     });
-
 };
 
-getRepoIssues("wfk-tokunaga/1-ucb");
+var displayWarning = function(repo) {
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+    var linkEl = document.createElement("a");
+    linkEl.setAttribute("href", `https://github.com/${repo}/issues`);
+    linkEl.setAttribute("target", "_blank");
+
+    limitWarningEl.appendChild(linkEl);
+};
+
+getRepoName();
+// getRepoIssues()
+// getRepoIssues("wfk-tokunaga/1-ucb");
+// getRepoIssues("facebook/react");
